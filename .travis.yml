@@ -21,3 +21,4 @@ deploy:
   file: abstract.pdf
   on:
     repo: skulumani/2018_sspi_abstract
+    tags: true
