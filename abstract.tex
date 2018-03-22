@@ -45,11 +45,6 @@ Our systematic approach avoids the difficulties in selecting an appropriate init
 We instead utilize the concept of the reachability set to enable a simple methodology of selecting initial conditions to achieve general orbital transfers.
 This method allows us to avoid the difficulties inherent in choosing valid initial conditions for the computation of optimal transfer trajectories.
 We develop the optimal control formulation and apply this method to an example transfer about asteroid 4769 Castalia, which is shown in~\cref{fig:castalia}.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\columnwidth]{figures/castalia.pdf}
-    \caption{4769 Castalia}\label{fig:castalia}
-\end{figure}
 \subsection{Motivation}
 
 The potential for asteroid impact presents one of the largest threats to the future of humanity.
@@ -129,12 +124,6 @@ By repeating the calculation we can determine a transfer about asteroid 4769 Cas
 We present an example transfer of a spacecraft about the asteroid 4769 Castalia.  
 We model the thruster of the spacecraft as a generic acceleration vector in the body-fixed asteroid frame. 
 The acceleration magnitude is chosen to emulate a physically realizable thruster system, such as those found on many operational ion or hall effect thrusters~\cite{goebel2008,choueiri2009}.
-\begin{figure}[H]
-    % \centering 
-    \includegraphics[width=0.5\columnwidth,height=\columnwidth,keepaspectratio]{figures/trajectory_3d.pdf} 
-    \caption{Transfer Trajectory}
-    \label{fig:transfer_3d} 
-\end{figure}
 
 The objective is to transfer the spacecraft between two periodic equatorial orbits about Castalia.
 \Cref{fig:transfer_3d} shows the initial, \( \vecbf{x}_i \), and target, \( \vecbf{x}_t\), periodic orbits which lie in the equatorial plane of Castalia.
