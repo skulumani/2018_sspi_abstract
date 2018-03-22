@@ -1,5 +1,5 @@
 
-\documentclass[11pt,reqno]{amsart} % use larger type; default would be 10pt
+\documentclass[11pt,reqno,twocolumn]{article} % use larger type; default would be 10pt
 
 \usepackage{multicol}
 \usepackage{my_packages}
@@ -9,133 +9,86 @@
 \renewcommand{\thesection}{\Roman{section}} 
 \renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
 
-\title{\vspace{-1.0cm}Spacecraft Trajectory Design near Asteroid 4769 Castalia}
+\title{Real Time Shape Reconstruction for Near Earth Asteroid Landing}
 \author{Shankar Kulumani}
-\thanks{PhD Candidate, Department of Mechanical and Aerospace Engineering, Email:~\href{mailto:skulumani@gwu.edu}{skulumani@gwu.edu}}
+% \thanks{PhD Candidate, Department of Mechanical and Aerospace Engineering, Email:~\href{mailto:skulumani@gwu.edu}{skulumani@gwu.edu}}
+
 
 \date{} % Activate to display a given date or no date (if empty),
          % otherwise the current date is printed 
 
 \begin{document}
 \maketitle
-\begin{multicols}{2}
-\section{Introduction}
+\subsubsection*{Motivation}
 % Motivation for missions/studying asteroids
-Small solar system bodies, such as asteroids and comets, are of significant interest to the scientific community; These small bodies offer great insight into the early formation of the solar system.
-This insight offers additional detail into the formation of the Earth and also the probable formation of other planetary bodies.
+Small solar system bodies, such as asteroids and comets, are of significant interest to the scientific community.
+These small bodies offer great insight into the early formation of the solar system.
 Of particular interest are those near-Earth asteroids (NEA) which inhabit heliocentric orbits in the vicinity of the Earth.
 These easily accessible bodies provide attractive targets to support space industrialization, mining operations, and scientific missions.
-NEAs potentially contain many materials such as those useful for propulsion, construction, or for use in semiconductors.
-Also, many bodies contain highly profitable materials, such as precious or strategic metals~\cite{ross2001}.
-In addition, these NEAs are also of concern for their potential to impact the Earth.
-Asteroids and comets are the greatest threat to future civilizations and as a result there is a focused effort to mitigate these risks~\cite{wie2008}.
-In spite of the great interest in asteroids, the operation of spacecraft in their vicinity is a challenging problem.
+Furthermore, these asteroids are of keen interest for more practical purposes.
+The recent meteor explosions in  2002 over Tagish Lake, Canada or over Chelyabinsk, Russia in 2013 are clear evidence of the risk of asteroid impacts on the Earth.
+These asteroids, which released an energy equivalent to \SI{5}{\kilo\tonne} of TNT, are estimated to strike the Earth on average every year~\cite{brown2002}.
+Larger bodies, such as the \SI{60}{\meter} object that exploded over Tunguska, Russia in 1908, release the energy equivalent to \SI{10}{\mega\tonne} of TNT and will occur on average every \num{1000} years.
+In spite of the significant interest in asteroid deflection, and the extensive research by the community, the operation of spacecraft in their vicinity remains a challenging problem.
 
-% Difficulty in system model
-While there has been significant study of interplanetary transfer trajectories, relatively less analysis has been conducted on operations in the vicinity of asteroids.
-The dynamic environment around asteroids is strongly perturbed and challenging for analysis and mission operation.
-Due to their low mass, which results in a low gravitational attraction, asteroids may have irregular shapes and potentially chaotic spin states.
-Furthermore, since the magnitude of the gravitational attraction is relatively small, non-gravitational effects, such as solar radiation pressure or third-body effects, become much more significant.
-As a result, the orbital environment is generally quite complex and it is difficult to generate analytical insights.
+\subsubsection*{Research Question}
+% describe our approach in this paper
+In this work, we develop an orbit and landing scheme for spacecraft onto an asteroid.
+The main objective is to construct the coupled equations of motion of a rigid spacecraft about an asteroid.
+This accurate dynamic model is then used to derive a nonlinear controller for the tracking of a landing trajectory.
+In contrast to much of the previous work, we explicitly consider the gravitational coupling between the orbit and attitude dynamics.
+In addition, we utilize a polyhedron potential model to represent the shape of the asteroid, which results in an exact closed form expression of the gravitational potential field~\cite{werner1994,werner1996}.
 
-\subsection{Research Question}
-In this paper, we extend the design method previously developed in the three-body problem to motion about asteroids.
-The authors present a systematic method of generating optimal transfer orbits about asteroids.
-Our systematic approach avoids the difficulties in selecting an appropriate initial guess for optimization.
-We instead utilize the concept of the reachability set to enable a simple methodology of selecting initial conditions to achieve general orbital transfers.
-This method allows us to avoid the difficulties inherent in choosing valid initial conditions for the computation of optimal transfer trajectories.
-We develop the optimal control formulation and apply this method to an example transfer about asteroid 4769 Castalia, which is shown in~\cref{fig:castalia}.
-\subsection{Motivation}
+In order to determine the shape of the asteroid, we model a laser ranging sensor (LIDAR) on a maneuvering spacecraft.
+The LIDAR is able to provide depth measurements of the surface of the asteroid.
+Given a set of depth measurements it is possible to compute the shape, and hence gravitational potential of the asteroid.
+Computing the shape of the asteroid on a continual basis avoids the long delay and computational complexity of current asteroid operations.
+Furthermore, the updated gravitational model enables a spacecraft to autonomously transition from a mapping orbit directly to landing.
 
-The potential for asteroid impact presents one of the largest threats to the future of humanity.
-Interplanetary space, while relatively empty by human standards, is filled with debris and the Earth is in a ``cosmic shooting gallery''.
-There is a continual bombardment of the Earth by a large range of planetary material.
-This was vividly demonstrated in 2013 by the Chelyabinsk air burst, where a \SIrange{10}{20}{\meter} asteroid exploded over the Russian city of Chelyabinsk on  15 February 2013.
-This event released the equivalent of approximately \SI{590}{\kilo\tonne} of TNT and is one of the few Earth impacts with eyewitness testimony.
-In spite of the meteorite exploding at over \SI{100}{\kilo\meter}, the shock wave was powerful enough to knock people off their feet and caused widespread damage to the surrounding area.
+\subsection*{Mathematical Formulation}\label{se:mathematical_problem}
+The gravitational potential around a constant density asteroid can be defined entirely from its shape.
+We model the asteroid shape as a set of vertices and triangular faces.
+Given this shape, the potential at any point around the asteroid is defined as
+\begin{align}\label{eq:potential}
+    U(\vecbf{r}) &= \frac{1}{2} G \sigma \sum_{e \in \text{edges}} \vecbf{r}_e \cdot \vecbf{E}_e \cdot \vecbf{r}_e \cdot L_e \nonumber\\
+                 &- \frac{1}{2}G \sigma \sum_{f \in \text{faces}} \vecbf{r}_f \cdot \vecbf{F}_f \cdot \vecbf{r}_f \cdot \omega_f \in \R^1.
+\end{align}
+In this work, we consider the motion of a dumbbell model of a spacecraft about an asteroid.
+The dumbbell spacecraft consists of two masses connected by a massless rod and is a well-known representation of a multi body spacecraft.
+Furthermore, the dumbbell model captures the important interactions of the coupling between orbital and attitude dynamics. 
 
-It is only a matter of time before a much more devastating body arrives at the Earth.
-As a result, it is imperative to develop spacecraft methodologies to avert any future impact scenarios.
-There is a growing body of research investigating a variety of impact mitigation techniques~\cite{wie2008,pitz2014}.
-A key requirement of these future missions is the ability to effectively design spacecraft trajectories. 
-In addition, a completely new design paradigm is required as the typical methods developed for use around the Earth or other large bodies is not applicable. 
-In this work, we present a systematic design method to design trajectories around these small bodies. 
-This type of work is ideal for future asteroid mitigation missions.
+\subsection*{Technical Approach}
 
-\section{Orbital Transfer Example}
-\begin{figure}[H]
-\begin{scaletikzpicturetowidth}{0.1\columnwidth}
-    \begin{tikzpicture}[tdplot_main_coords,
-          poincare/.style={opacity=.2,very thick,fill=blue},
-          orbit/.style={very thick,black},
-          orbit hidden/.style={very thick,dashed},
-          grid/.style={very thin,black},
-          axis/.style={->,blue,thick},
-          reachability/.style={thick,blue}, scale=0.4]
-
-        % nodes for the poincare section
-        \node[label=above:\(\Sigma\)] (upper_right) at (0,5,5) {};
-        \node[] (upper_left) at (0,1,5) {};
-        \node[] (lower_left) at (0,1,0) {};
-        \node[] (lower_right) at (0,5,0) {};
-
-        % draw poincare section
-        \draw[poincare] (upper_right.center) -- (upper_left.center) -- (lower_left.center) -- (lower_right.center) -- (upper_right.center);
-        
-        % draw a periodic orbit
-        \coordinate (center) at (0,0,2);
-        \node[label=below:\(\vecbf{x}_0\)] (x0) at (0,3,2) {};
-        % \node[label=below:\(\vecbf{x}_n\)] at (x0) {};
-        \filldraw (x0) circle (3pt);
-
-        % \tdplotdrawarc[orbit hidden]{(center)}{3}{90}{200}{}{};
-        \tdplotdrawarc[orbit,<-]{(center)}{3}{-160}{90}{}{};
-
-        % draw reachability set on the poincare section
-        \coordinate (reach) at (0,4.5,2);
-        \tdplotsetthetaplanecoords{90}
-
-        \draw[tdplot_rotated_coords,grid] (x0) -- (reach);
-        \draw[tdplot_rotated_coords,grid] (x0) -- ++(-45:1.5);
-
-        \tdplotdrawarc[tdplot_rotated_coords,grid]{(x0)}{0.5}{-45}{90}{above}{\(\phi\)};
-
-        % draw terminal state on reachability set
-        \node[tdplot_rotated_coords,label=above:\(\vecbf{x}_f\)] (xf) at ($ (x0)+(-45:1.5) $) {};
-        \filldraw (xf) circle (3pt);
-
-        \node[tdplot_rotated_coords,label=below:\(J\)] at (xf) {};
-
-        \tdplotdrawarc[tdplot_rotated_coords,reachability]{(x0)}{1.5}{0}{360}{}{};
-        % place
-    \end{tikzpicture}
-\end{scaletikzpicturetowidth}
-\caption{Reachability Set\label{fig:reachability_set}}
+\begin{figure}
+    \centering
+    \includegraphics[width=\columnwidth,trim={50mm 30mm 50mm 30mm},clip]{figures/itokawa_blender.png}
+    \caption{Realistic rendering of Itokawa}
 \end{figure}
-We utilize the concept of a reachability set to design our transfer trajectories.
-\Cref{fig:reachability_set} illustrates this methodology.
-Without any control input, the trajectories will follow the system dynamics and intersect the \Poincare section at \( \vecbf{x}_0 = \vecbf{x}_n\).
-The addition of a control input allows the spacecraft to depart from the natural dynamics and intersect the section at another location denoted by the dashed circle.
-We use the cost function \( J \) to define a distance metric on the \Poincare section.
-Maximization of \( J \), or the minimization of \( -J \), along various directions, which are parameterized using \( \phi_d \), on the \Poincare section allows us to generate the largest reachability set under the bounded control input.
-We then select a trajectory from the reachable set which lies closest to the desired target. 
-By repeating the calculation we can determine a transfer about asteroid 4769 Castalia.
 
-We present an example transfer of a spacecraft about the asteroid 4769 Castalia.  
-We model the thruster of the spacecraft as a generic acceleration vector in the body-fixed asteroid frame. 
-The acceleration magnitude is chosen to emulate a physically realizable thruster system, such as those found on many operational ion or hall effect thrusters~\cite{goebel2008,choueiri2009}.
+Prior to the arrival at the asteroid, it is only possible to determine a coarse ellipsoidal approximation of the shape of an asteroid from ground based measurements. 
+As a result, the dynamic model of the gravitational environment will be inaccurate until the shape of the asteroid is determined. 
+We simulate measurements of the surface using a laser range finder mounted on the spacecraft.
+A laser depth sensor, or LIDAR, provides the distance to the surface by measuring the round trip time of flight of reflections from the surface.
+We simulate the measurements of the surface using an efficient ray casting technique based on a modified binary space partition tree~\cite{formella1995}.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/raycasting.png}
+    \caption{Ray Casting example around Itokawa\label{fig:raycasting}}
+\end{figure}
+\Cref{fig:raycasting} shows an example of ray casting to determine depth measurements of the surface of asteroid Itokawa.
+The rays from the spacecraft to the asteroid are shown in red, while the measurements of the surface are shown in yellow.
+By combining many measurements of the surface a  point cloud representation of the asteroid is generated.
 
-The objective is to transfer the spacecraft between two periodic equatorial orbits about Castalia.
-\Cref{fig:transfer_3d} shows the initial, \( \vecbf{x}_i \), and target, \( \vecbf{x}_t\), periodic orbits which lie in the equatorial plane of Castalia.
-Our goal is to transfer from a lower altitude to a higher altitude while remaining in the equatorial plane of the asteroid.
-This type of scenario would occur frequently during mapping and observation missions to asteroids.
-
-We can see in~\cref{fig:transfer_3d} that this transfer requires four iterations of the reachable set computation. 
-Each reachability set progressively approaches the target periodic orbit.
-The final computation intersects the target periodic orbit on our chosen \Poincare section and allows for a complete orbital transfer between the two orbits of 4769 Castalia.
-
-\bibliographystyle{amsplain}
+The shape of the asteroid is computed in near real time instead of requiring ground based computation.
+This allows for a much larger class of missions and removes the need for the spacecraft to remain in a mapping specific orbit for long periods of time.
+Instead, the spacecraft is able to autonomously compute the shape while maneuvering.
+The final step is to reconstruct the shape of the asteroid from the depth measurements~\cite{hoppe1992}.
+\subsubsection*{Contribution}
+We will simultaneously derive the shape of the asteroid while maneuvering.
+This alleviates the long and labor intensive efforts to determine the shape in a specific mapping orbit.
+Instead, our approach allows for online shape generation and enables for responsive and short duration missions to the asteroid surface.
+\bibliographystyle{plain}
 \bibliography{library.bib}
 
-\end{multicols}
 \end{document}
+
